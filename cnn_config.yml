@@ -1,0 +1,4 @@
+channels1: 8
+channels2: 4
+kernel_size: 10
+num_bottleneck_convs: 2

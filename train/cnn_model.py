@@ -1,8 +1,14 @@
 import tensorflow as tf
+import numpy as np
 
 class IntronExonCNN(tf.keras.Model):
-    def __init__(self, channels1, channels2, kernel_size, num_bottleneck_convs):
+    def __init__(self, cnn_config):
         super(IntronExonCNN, self).__init__()
+
+        channels1 = cnn_config['channels1']
+        channels2 = cnn_config['channels2']
+        kernel_size = cnn_config['kernel_size']
+        num_bottleneck_convs = cnn_config['num_bottleneck_convs']
 
         self.E_nucleotide = tf.keras.layers.Embedding(4, 4)
 
@@ -43,4 +49,13 @@ class IntronExonCNN(tf.keras.Model):
         output = self.final(x)
         return output
 
+    @staticmethod
+    def loss(outputs, labels):
+        losses = tf.keras.metrics.binary_crossentropy(labels, outputs, from_logits=False)
+        return np.mean(losses)
 
+    @staticmethod
+    def accuracy(outputs, labels, threshold=0.5):
+        outputs_gt_threshold = np.where(outputs > threshold, 1, 0)
+        m = tf.keras.metrics.binary_accuracy(labels, outputs_gt_threshold)
+        return np.sum(m) / len(m)

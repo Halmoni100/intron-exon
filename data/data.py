@@ -3,10 +3,10 @@ import numpy as np
 
 from loadData import get_data
 
-def get_train_data(seq_train_file, exon_train_file):
-    seq_train_file_path = os.path.join(os.environ['INTRON_EXON_ROOT'], seq_train_file)
-    exon_train_file_path = os.path.join(os.environ['INTRON_EXON_ROOT'], exon_train_file)
-    seq, seq_dict, exon_coord = get_data(seq_train_file_path, exon_train_file_path)
+def initial_process_data(seq_file, exon_file):
+    seq_file_path = os.path.join(os.environ['INTRON_EXON_ROOT'], seq_file)
+    exon_file_path = os.path.join(os.environ['INTRON_EXON_ROOT'], exon_file)
+    seq, seq_dict, exon_coord = get_data(seq_file_path, exon_file_path)
     return seq, seq_dict, exon_coord
 
 def preprocess(seq, exon_coord, window_size):

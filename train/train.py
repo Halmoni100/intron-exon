@@ -70,10 +70,14 @@ def train_loop(train_inputs, train_labels, test_inputs, test_labels,
     epoch = 0
     while epoch > num_epochs:
         avg_train_loss = train_epoch(train_inputs, train_labels, model, optimizer, batch_size, loss_fn)
-        avg_val_loss, avg_metric = test(test_inputs, test_labels, model, batch_size, metric_fn)
+        avg_val_loss, avg_val_metric = test(test_inputs, test_labels, model, batch_size, metric_fn)
 
         history['loss'].append(avg_train_loss)
         history['val_loss'].append(avg_val_loss)
+        history['val_' + metric_name].append(avg_val_metric)
+        print("[epoch %2d]  train loss: %.5f  val loss: %.5f  val %s: %.3f" %
+              (epoch + 1, avg_train_loss, avg_val_loss, metric_name, avg_val_metric))
 
+        epoch += 1
 
 
