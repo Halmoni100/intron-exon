@@ -1,0 +1,4 @@
+seq_train_file: dataInput/seqTrain.txt
+exon_train_file: dataInput/exonCoordinates_train.csv
+
+window_size: 1000
