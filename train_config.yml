@@ -1,9 +1,4 @@
-seq_train_file: dataInput_exonIntron500/seqTrain.txt
-exon_train_file: dataInput_exonIntron500/exonCoordinates_train.csv
-
-seq_test_file: dataInput_exonIntron500/seqTest.txt
-exon_test_file: dataInput_exonIntron500/exonCoordinates_test.csv
-
-window_size: 2000
-batch_size: 32
-learning_rate: 1e-3
+window_size: 1000
+batch_size: 64
+learning_rate: 1.0e-3
+num_epochs: 100

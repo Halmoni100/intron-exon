@@ -1,0 +1,5 @@
+experiments/
+data/split_1000/
+data/split_2000/
+data/split_4000/
+temp/

@@ -13,8 +13,10 @@ class IntronExonCNN(tf.keras.Model):
         self.E_nucleotide = tf.keras.layers.Embedding(4, 4)
 
         self.max_pooling = tf.keras.layers.MaxPooling1D(2)
+
         self.conv_f1 = tf.keras.layers.Conv1D(channels1, kernel_size, activation='relu', padding='same')
         self.conv_f2 = tf.keras.layers.Conv1D(channels2, kernel_size, activation='relu', padding='same')
+        self.conv_f3 = tf.keras.layers.Conv1D(channels2, kernel_size, activation='relu', padding='same')
 
         if num_bottleneck_convs % 2 != 0:
             raise ValueError("Need even number of bottleneck convolutions for residual connections")
@@ -24,8 +26,9 @@ class IntronExonCNN(tf.keras.Model):
             self.bottleneck_convs.append(tf.keras.layers.Conv1D(channels2, kernel_size, activation='relu', padding='same'))
 
         self.up_sampling = tf.keras.layers.UpSampling1D(2)
-        self.conv_b1 = tf.keras.layers.Conv1D(channels2, kernel_size, activation='relu', padding='same')
-        self.conv_b2 = tf.keras.layers.Conv1D(channels1, kernel_size, activation='relu', padding='same')
+        self.conv_b3 = tf.keras.layers.Conv1D(channels2, kernel_size, activation='relu', padding='same')
+        self.conv_b2 = tf.keras.layers.Conv1D(channels2, kernel_size, activation='relu', padding='same')
+        self.conv_b1 = tf.keras.layers.Conv1D(channels1, kernel_size, activation='relu', padding='same')
 
         self.final = tf.keras.layers.Conv1D(1, kernel_size, activation='sigmoid', padding='same')
 
@@ -42,9 +45,9 @@ class IntronExonCNN(tf.keras.Model):
             x2 = self.bottleneck_convs[i+1](x1)
             x += x2
 
-        x = self.conv_b1(x)
-        x = self.up_sampling(x)
         x = self.conv_b2(x)
+        x = self.up_sampling(x)
+        x = self.conv_b1(x)
         x = self.up_sampling(x)
         output = self.final(x)
         return output
@@ -52,10 +55,10 @@ class IntronExonCNN(tf.keras.Model):
     @staticmethod
     def loss(outputs, labels):
         losses = tf.keras.metrics.binary_crossentropy(labels, outputs, from_logits=False)
-        return np.mean(losses)
+        return tf.reduce_mean(losses)
 
     @staticmethod
     def accuracy(outputs, labels, threshold=0.5):
         outputs_gt_threshold = np.where(outputs > threshold, 1, 0)
         m = tf.keras.metrics.binary_accuracy(labels, outputs_gt_threshold)
-        return np.sum(m) / len(m)
+        return np.sum(m) / (m.shape[0] * m.shape[1])
