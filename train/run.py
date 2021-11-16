@@ -10,6 +10,7 @@ for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
 
 from cnn_model import IntronExonCNN
+from rnn_model import IntronExonRNN
 from data.data import get_exon_ratio
 from train import train_loop, plot_training_history
 
@@ -58,6 +59,9 @@ model_class = None
 if args.model == 'CNN':
     model = IntronExonCNN(model_config)
     model_class = IntronExonCNN
+elif args.model == 'RNN':
+    model = IntronExonRNN(model_config)
+    model_class = IntronExonRNN
 else:
     raise ValueError('No valid model')
 

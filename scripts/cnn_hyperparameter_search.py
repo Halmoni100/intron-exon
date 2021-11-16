@@ -12,7 +12,7 @@ def write_yaml(data, path):
 
 experiments_dir = os.path.join(os.environ['INTRON_EXON_ROOT'], "experiments")
 temp_dir = os.path.join(os.environ['INTRON_EXON_ROOT'], "temp")
-cnn_experiments_dir = os.path.join(experiments_dir, "cnn")
+cnn_experiments_dir = os.path.join(experiments_dir, "stacked_bidirectional_rnn")
 
 channels = [(16, 8), (32, 16), (16, 16), (32, 32)]
 kernel_sizes = [5, 7, 10]
