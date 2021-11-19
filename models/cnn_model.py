@@ -23,7 +23,7 @@ class IntronExonCNN(tf.keras.Model):
 
         self.bottleneck_convs = []
         for _ in range(num_bottleneck_convs):
-            self.bottleneck_convs.append(tf.keras.layers.Conv1D(channels2, kernel_size, dilation_rate=2, activation='relu', padding='same'))
+            self.bottleneck_convs.append(tf.keras.layers.Conv1D(channels2, kernel_size, activation='relu', padding='same'))
 
         self.up_sampling = tf.keras.layers.UpSampling1D(2)
         self.conv_b3 = tf.keras.layers.Conv1D(channels2, kernel_size, activation='relu', padding='same')

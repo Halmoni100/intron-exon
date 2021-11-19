@@ -1,18 +1,19 @@
-import os
-import itertools
-import pathlib
-import yaml
+import os, sys
+sys.path.append(os.getenv("INTRON_EXON_ROOT"))
 
-from utils import rm_and_mkdir, run_bash_script
+import itertools
+import yaml
+from subprocess import Popen
+
+from misc.utils import rm_and_mkdir
 
 def write_yaml(data, path):
     with open(path, 'w') as f:
         stream = yaml.dump(data, default_flow_style=False)
         f.write(stream)
 
-experiments_dir = os.path.join(os.environ['INTRON_EXON_ROOT'], "experiments")
-temp_dir = os.path.join(os.environ['INTRON_EXON_ROOT'], "temp")
-cnn_experiments_dir = os.path.join(experiments_dir, "stacked_bidirectional_rnn")
+experiments_dir = os.path.join(os.getenv("INTRON_EXON_ROOT"), "experiments")
+cnn_experiments_dir = os.path.join(experiments_dir, "cnn")
 
 channels = [(16, 8), (32, 16), (16, 16), (32, 32)]
 kernel_sizes = [5, 7, 10]
@@ -41,10 +42,13 @@ for combination in itertools.product(channels, kernel_sizes, num_bottleneck_conv
     train_config_path = os.path.join(curr_experiment_dir, "train_config.yml")
     write_yaml(train_config_data, train_config_path)
 
-    run_script = "cd " + os.environ['INTRON_EXON_ROOT'] + "\n"
-    run_script += "python train/run.py --train_config " + train_config_path + " --model_config " + cnn_config_path + \
+    os.chdir(os.path.join(os.getenv("INTRON_EXON_ROOT"), "train"))
+
+    run_script = "python run.py --train_config " + train_config_path + " --model_config " + cnn_config_path + \
         " --output_dir " + curr_experiment_dir
-    run_bash_script(run_script, temp_dir)
+
+    proc = Popen(run_script.split(' '))
+    proc.wait()
 
     experiment_num += 1
 

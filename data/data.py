@@ -1,5 +1,5 @@
 import os, sys
-sys.path.append(os.environ['INTRON_EXON_ROOT'])
+sys.path.append(os.getenv("INTRON_EXON_ROOT"))
 
 import numpy as np
 import math
@@ -8,12 +8,10 @@ if __name__ == "__main__":
     from loadData import get_data
 else:
     from data.loadData import get_data
-from scripts.utils import rm_and_mkdir
+from misc.utils import rm_and_mkdir
 
 def initial_process_data(seq_file, exon_file):
-    seq_file_path = os.path.join(os.environ['INTRON_EXON_ROOT'], seq_file)
-    exon_file_path = os.path.join(os.environ['INTRON_EXON_ROOT'], exon_file)
-    seq, seq_dict, exon_coord = get_data(seq_file_path, exon_file_path)
+    seq, seq_dict, exon_coord = get_data(seq_file, exon_file)
     return seq, seq_dict, exon_coord
 
 def preprocess(seq, exon_coord, window_size):
@@ -45,14 +43,14 @@ def get_exon_ratio(exon_coord):
 
 def main():
     window_size = 4000
-    seq_file = "dataInput_exonIntron500/seqAllInOne.txt"
-    exon_file = "dataInput_exonIntron500/exonCoordinates_allInOne.csv"
+    seq_file = os.path.join(os.getenv("INTRON_EXON_ROOT"), "dataInput_exonIntron500", "seqAllInOne.txt")
+    exon_file = os.path.join(os.getenv("INTRON_EXON_ROOT"), "dataInput_exonIntron500", "exonCoordinates_allInOne.csv")
     seq, seq_dict, exon_coord = initial_process_data(seq_file, exon_file)
     windowed_seq, windowed_exon = preprocess(seq, exon_coord, window_size)
     train_seq, train_exon, val_seq, val_exon, test_seq, test_exon = \
         split_train_val_test(windowed_seq, windowed_exon)
 
-    data_dir = os.path.join(os.environ['INTRON_EXON_ROOT'], "data/split_" + str(window_size))
+    data_dir = os.path.join(os.getenv("INTRON_EXON_ROOT"), "data", "split_" + str(window_size))
     rm_and_mkdir(data_dir)
 
     train_seq_file = os.path.join(data_dir, "train_seq.npy")

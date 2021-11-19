@@ -1,13 +1,14 @@
-import math
 import os, sys
-sys.path.append(os.environ['INTRON_EXON_ROOT'])
+sys.path.append(os.getenv("INTRON_EXON_ROOT"))
+
+import math
 
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 
 from progress_bar import ProgressBar
-from scripts.utils import mkdir_if_not_exist
+from misc.utils import mkdir_if_not_exist
 
 def train_epoch(inputs, labels, model, optimizer, batch_size, loss_fn):
     num_inputs = inputs.shape[0]

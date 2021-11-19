@@ -4,6 +4,8 @@ import yaml
 import pandas as pd
 
 columns = [
+    # dir
+    'directory',
     # train config
     'batch_size',
     'learning_rate',
@@ -22,10 +24,11 @@ columns = [
 def get_dataframe():
     df = pd.DataFrame(columns=columns)
 
-    cnn_experiments_dir = os.path.join(os.environ['INTRON_EXON_ROOT'], "experiments/cnn")
+    cnn_experiments_dir = os.path.join(os.getenv("INTRON_EXON_ROOT"), "experiments", "cnn")
     for experiment_dir in os.listdir(cnn_experiments_dir):
         experiment_path = os.path.join(cnn_experiments_dir, experiment_dir)
-        entries = []
+        entries = list()
+        entries.append(experiment_dir)
 
         train_config_path = os.path.join(experiment_path, 'train_config.yml')
         if not os.path.exists(train_config_path):

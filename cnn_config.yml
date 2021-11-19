@@ -2,3 +2,4 @@ channels1: 32
 channels2: 16
 kernel_size: 5
 num_bottleneck_convs: 4
+num_stacks: 1

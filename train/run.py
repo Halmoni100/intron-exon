@@ -1,5 +1,5 @@
 import os, sys
-sys.path.append(os.environ['INTRON_EXON_ROOT'])
+sys.path.append(os.getenv("INTRON_EXON_ROOT"))
 
 import argparse
 import yaml
@@ -9,8 +9,10 @@ gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
 
-from cnn_model import IntronExonCNN
-from rnn_model import IntronExonRNN
+from models.cnn_model import IntronExonCNN
+from models.rnn_model import IntronExonRNN
+from models.cnn_rnn_hybrid import Hybrid
+from models.cnn_v2 import CNNV2
 from data.data import get_exon_ratio
 from train import train_loop, plot_training_history
 
@@ -21,21 +23,13 @@ parser.add_argument('--model_config', help='Model config file')
 parser.add_argument('--output_dir', default=None, help='Output dir for experiments')
 args = parser.parse_args()
 
-def rel_or_abs_path(path):
-    if path[0] == '/':
-        return path
-    else:
-        return os.path.join(os.environ['INTRON_EXON_ROOT'], path)
-
-train_config_path = rel_or_abs_path(args.train_config)
-with open(train_config_path, 'r') as f:
+with open(args.train_config, 'r') as f:
     train_config = yaml.safe_load(f)
-model_config_path = rel_or_abs_path(args.model_config)
-with open(model_config_path, 'r') as f:
+with open(args.model_config, 'r') as f:
     model_config = yaml.safe_load(f)
 
 def get_numpy_data(window_size):
-    data_dir = os.path.join(os.environ['INTRON_EXON_ROOT'], "data/split_" + str(window_size))
+    data_dir = os.path.join(os.getenv("INTRON_EXON_ROOT"), "data", "split_" + str(window_size))
     train_seq_file = os.path.join(data_dir, "train_seq.npy")
     train_seq = np.load(train_seq_file)
     train_exon_file = os.path.join(data_dir, "train_exon.npy")
@@ -59,9 +53,15 @@ model_class = None
 if args.model == 'CNN':
     model = IntronExonCNN(model_config)
     model_class = IntronExonCNN
+elif args.model == 'CNNV2':
+    model = CNNV2(model_config)
+    model_class = CNNV2
 elif args.model == 'RNN':
     model = IntronExonRNN(model_config)
     model_class = IntronExonRNN
+elif args.model == 'HYBRID':
+    model = Hybrid(model_config)
+    model_class = Hybrid
 else:
     raise ValueError('No valid model')
 
@@ -83,12 +83,10 @@ print("Max accuracy", max_acc, "at epoch", max_acc_epoch)
 if args.output_dir is None:
     exit(0)
 
-output_dir = rel_or_abs_path(args.output_dir)
-
-plot_path = os.path.join(output_dir, "train_history.png")
+plot_path = os.path.join(args.output_dir, "train_history.png")
 plot_training_history(history, metric_name='acc', metric_full_name='accuracy', save_path=plot_path)
 
-results_path = os.path.join(output_dir, "results.csv")
+results_path = os.path.join(args.output_dir, "results.csv")
 with open(results_path, 'w') as f:
     lines = list()
     lines.append("end_acc,end_epoch,max_acc,max_epoch\n")
